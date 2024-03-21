@@ -1,31 +1,36 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Pressable } from "react-native";
+import React from "react";
+import { useNotification } from "../contexts/NotificationsContext";
 
-export default function Notification({ route }) {
-  const { message } = route.params || { message: "No message available" };
-
-
-  const currentDate = new Date();
-  const hours = currentDate.getHours();
-  const minutes = currentDate.getMinutes();
-  const month = currentDate.getMonth() + 1;
-  const year = currentDate.getFullYear();
-  const day = currentDate.toLocaleDateString('en-US', { weekday: 'long' });
-
-  const dateTimeString = `${hours}:${minutes}, ${currentDate.toDateString()}, ${month}/${year},${day}`;
-
+export default function Notification() {
+  const { notifications, pushNotification, markNotificationAsRead } =
+    useNotification();
+  console.log(notifications);
   return (
-    <View style={styles.container}>
-      <Text>{message}</Text>
-      <Text>{dateTimeString}</Text>
+    <View>
+      {notifications.map((notification) => (
+        <View>
+          <Text>
+            {notification.message}
+            {notification.isRead ? " read" : " not read"}
+          </Text>
+          <View>
+            <Text>{new Date(notification.date).toLocaleDateString()}</Text>
+            <Pressable
+              style={{
+                width: 100,
+                height: 40,
+                backgroundColor: "blue",
+              }}
+              onPress={() => {
+                markNotificationAsRead(notification.id);
+              }}
+            >
+              <Text>Mark as Read</Text>
+            </Pressable>
+          </View>
+        </View>
+      ))}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
